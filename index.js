@@ -1,7 +1,15 @@
 import express from "express";
+import Product from "./model/product.js";
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+import dns from "node:dns/promises";
+import cors from "cors";
+
+dotenv.config();
+
+dns.setServers(["1.1.1.1", "8.8.8.8"]);
 
 const app = express();
-import cors from "cors";
 app.use(cors({
   origin: "http://localhost:5173",
   methods: ["GET", "POST", "PUT", "DELETE"],
@@ -9,53 +17,57 @@ app.use(cors({
 app.use(express.json());
 
 
-let products = [
-  {
-    id: 1,
-    name: "vivo x300 pro",
-    price: 350000,
-    description: "This is a mobile phone",
-    imageUrl: "https://www.vivo.com/pk/products/x300-pro",
-  },
-  {
-    id: 2,
-    name: "vivo v60",
-    price: 120000,
-    description: "This is a mobile phone",
-    imageUrl:
-     "https ://www.lahorecentre.com/products/vivo-v60-256gb-storage-12gb-ram?srsltid=AfmBOopL6nzjwiaj-IMFd-V-0-axlenP88PlOq4uFIFZhHP1583UqqwKhttps://www.lahorecentre.com/products/vivo-v60-256gb-storage-12gb-ram?srsltid=AfmBOopL6nzjwiaj-IMFd-V-0-axlenP88PlOq4uFIFZhHP1583UqqwK", 
-  },
-];
-app.get("/products", (req, res) => {
-  res.json(products);
+mongoose.connect(process.env.MONGODB_URI)
+  .then(() => console.log("Connected to MongoDB"))
+  .catch((error) => console.error("MongoDB connection failed:", error));
+
+app.get("/products", async (req, res) => {
+  try {
+    const products = await Product.find();
+    res.json(products);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch products" });
+  }
 }); 
 
 app.get("/", (req, res) => {
   res.json("This is Get API");
 });
 
-app.post("/products", (req, res) => {
-  const newProduct = req.body;
-  products.push(newProduct);
-  res.status(201).json(newProduct);
+app.post("/products", async (req, res) => {
+  try {
+    const newProductFields = req.body;
+    const newProduct = new Product(newProductFields);
+    await newProduct.save();
+    res.status(201).json(newProduct);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to add product" });
+  }
 });
 
-app.delete("/products/:id", (req, res) => {
-  const productId = parseInt(req.params.id);
-  products = products.filter((product) => product.id !== productId);
-  res.status(204).send();
+app.delete("/products/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    await Product.findByIdAndDelete(id);
+    res.status(204).send();
+  } catch (error) {
+    res.status(500).json({ error: "Failed to delete product" });
+  }
+});
 
-}); 
+app.put("/products/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updateProductFields = req.body;
+    const updatedProduct = await Product.findByIdAndUpdate(
+    { id},
+      updateProductFields,
+      { new: true }
+    );
 
-app.put("/products/:id", (req, res) => {
-  const {id} = req.params;
-  const updatedProduct = req.body;
-  const index = products.findIndex((product) => product.id === parseInt(id));
-  if (index !== -1) {
-    products[index] = { ...products[index], ...updatedProduct };
-    res.json(products[index]);
-  } else {
-    res.status(404).json({ error: "Product not found" });
+    res.status(200).json(updatedProduct);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to update product" });
   }
 });
 
