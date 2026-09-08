@@ -48,7 +48,7 @@ app.post("/products", async (req, res) => {
 app.delete("/products/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    await Product.findOneAndDelete({ _id: id });
+    await Product.findOneAndDelete({ id: id });
     res.status(204).send();
   } catch (error) {
     res.status(500).json({ error: "Failed to delete product" });
