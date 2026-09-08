@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState ,useRef} from 'react'
 import axios from 'axios'
 import './App.css'
 
 function App() {
   const [count, setCount] = useState(0)
   const [products, setProducts] = useState([])
+  const updateSectionRef = useRef(null);
   //update product PUT//
   const [updateId, setUpdateId] = useState('');
   const [updateTitle, setUpdateTitle] = useState('');
@@ -59,9 +60,12 @@ function App() {
     const selectedId = item.id || item._id || '' ;
     setUpdateId(selectedId);
     setUpdateTitle(item.title || item.name || '');
-    setUpdateImageUrl(item.image || '');
+    setUpdateImageUrl(item.image || item.imageUrl || '');
     setUpdatePrice(item.price || '');
     setUpdateDesc(item.desc || item.description || '');
+    if (updateSectionRef.current) {
+      updateSectionRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   // 2. PUT Function
@@ -149,6 +153,9 @@ function App() {
         </form>
 
         {/* Product Update Form */}
+        <div classNam="update-section" ref={updateSectionRef}>
+          <h2>Update Product</h2>
+          </div>
         <form className="form-card" onSubmit={handleUpdateProduct}>
           <h3>Product Update</h3>
           <input
@@ -195,28 +202,45 @@ function App() {
             products.map((item, index) => (
               <div key={item.id || item._id || index} className="product-card">
                 <div className="img-container">
-                  <img src={item.imageUrl || item.image} 
+                  <img
+                   src={item.imageUrl || item.image} 
                   alt={item.title || item.name || 'Product Image'}
                   style={{ width: '100%', height: 'auto', maxHeight: '200px',objectFit: "contain",
                     borderRadius: '8px', marginBottom: '10px'
                    }} />
                 </div>
-                
+              
+{/* FORMAL LABELS & DETAILS */}
+          <div className="product-details" style={{ marginTop: "12px", textAlign: "left" }}>
+            <h3 style={{ textTransform: "capitalize", margin: "4px 0" }}>
+              <strong>Title:</strong> {item.title || item.name || 'Untitled Product'}
+            </h3>
+            
+            <p style={{ fontWeight: "bold", margin: "4px 0", color: "#2c3e50" }}>
+              <strong>Price:</strong> ${item.price}
+            </p>
 
-                <h4>{item.title || item.name|| 'Untitled Product'}</h4>
-                {item.price && <p className="price">{item.price}</p>}
-                <p className="desc">{item.desc || item.description}</p>
-                <div className="card-actions">
-                  <button type="button" className="btn btn-secondary" onClick={() => handleSelectForUpdate(item)}>
-                    Edit
-                  </button>
-                  <button type="button" className="btn btn-danger" onClick={() => handleDeleteProduct(item.id || item._id)}>
-                    Delete
-                  </button>
-                </div>
-                <button type="button" className="btn btn-primary btn-full">Add to Cart</button>
-              </div>
-            ))
+            <p style={{ margin: "8px 0", color: "#555", textAlign: "center" }}>
+              <strong>Description:</strong> {item.desc || item.description || 'No description provided.'}
+            </p>
+          </div>
+
+          {/* CENTERED BUTTONS INCLUDING ADD TO CART */}
+          <div className="card-actions" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px", marginTop: "12px" }}>
+            <div style={{ display: "flex", gap: "10px" }}>
+              <button type="button" className="btn btn-secondary" onClick={() => handleSelectForUpdate(item)}>
+                Edit
+              </button>
+              <button type="button" className="btn btn-secondary" onClick={() => handleDeleteProduct(item.id || item._id)}>
+                Delete
+              </button>
+            </div>
+            <button type="button" className="btn btn-secondary">
+              Add to Cart
+            </button>
+          </div>
+        </div>
+              ))
           )}
         </div>
       </div>
