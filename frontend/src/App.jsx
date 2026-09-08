@@ -95,6 +95,10 @@ function App() {
 
   // 3. DELETE Function
   const handleDeleteProduct = async (id) => {
+    if (!id) {
+      console.error('No product ID provided for deletion.')
+      return
+    }
     try {
       await axios.delete(`https://mongo-db-production-8ab9.up.railway.app/products/${id}`)
       fetchProducts()
@@ -149,7 +153,7 @@ function App() {
             Add Product</button>
         </form>
       </div>
-//
+
       {/* PRODUCT UPDATE CARD */}
       <div className="update-section" 
       ref={updateSectionRef} 
