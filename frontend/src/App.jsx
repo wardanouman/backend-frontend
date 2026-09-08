@@ -21,7 +21,7 @@ function App() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get('http://')
+        const response = await axios.get('https://mongo-db-production-8ab9.up.railway.app/products/')
         console.log('Fetched products:', response.data)
         setProducts(response.data)
       } catch (error) {
@@ -37,8 +37,9 @@ function App() {
   const handleAddProduct = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(' https://mongo-db-production-8ab9.up.railway.app', {
-        title: newTitle,
+      await axios.post(' https://mongo-db-production-8ab9.up.railway.app/products', {
+        id : new Date().getTime().toString(),
+        name: newTitle,
         image: newImage,
         price: Number(newPrice),
         desc: newDesc,
@@ -71,9 +72,9 @@ function App() {
       return;
     }
     try {
-      await axios.put(`httpsmongo-db-production-8ab9.up.railway.app${updateId}`, {
-        title: updateTitle,
-        image: updateImage,
+      await axios.put(`https://mongo-db-production-8ab9.up.railway.app/products/${updateId}`, {
+        name: updateTitle,
+        imageUrl: updateImage,
         price: Number(updatePrice),
         desc: updateDesc,
       });
@@ -91,7 +92,7 @@ function App() {
   // 3. DELETE Function
   const handleDeleteProduct = async (id) => {
     try {
-      await axios.delete(`https://mongo-db-production-8ab9.up.railway.app${id}`)
+      await axios.delete(`https://mongo-db-production-8ab9.up.railway.app/products/${id}`)
       fetchProducts()
     } catch (error) {
       console.error('Error deleting product:', error)
@@ -100,7 +101,7 @@ function App() {
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get('https://mongo-db-production-8ab9.up.railway.app')
+      const response = await axios.get('https://mongo-db-production-8ab9.up.railway.app/products/')
       console.log('Fetched products:', response.data)
       setProducts(response.data)
     } catch (error) {

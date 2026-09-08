@@ -48,7 +48,7 @@ app.post("/products", async (req, res) => {
 app.delete("/products/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    await Product.findByIdAndDelete(id);
+    await Product.findOneAndDelete({ _id: id });
     res.status(204).send();
   } catch (error) {
     res.status(500).json({ error: "Failed to delete product" });
@@ -59,8 +59,8 @@ app.put("/products/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const updateProductFields = req.body;
-    const updatedProduct = await Product.findByIdAndUpdate(
-    { id},
+    const updatedProduct = await Product.findOneAndUpdate(
+      { _id: id },
       updateProductFields,
       { new: true }
     );
