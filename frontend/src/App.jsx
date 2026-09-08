@@ -93,30 +93,51 @@ function App() {
     }
   }
 
-  // 3. DELETE Function
-  const handleDeleteProduct = async (id) => {
-    if (!id) {
-      console.error('No product ID provided for deletion.')
-      return
-    }
-    try {
-      await axios.delete(`https://mongo-db-production-8ab9.up.railway.app/products/${id}`)
-      fetchProducts()
-    } catch (error) {
-      console.error('Error deleting product:', error)
-    }
-}
-
+  
   const fetchProducts = async () => {
     try {
-      const response = await axios.get('https://mongo-db-production-8ab9.up.railway.app/products/')
+      const response = await axios.get('https://mongo-db-production-8ab9.up.railway.app/products/', {
+        headers: {
+          'Cache-Control': 'no-cache'
+        }
+      });
       console.log('Fetched products:', response.data)
       setProducts(response.data)
     } catch (error) {
       console.error('Error fetching products:', error)
     }
   }
+ 
+const handleDeleteProduct = async (e, id) => {
+  if (e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
 
+  // Handle case whether id is passed directly or via click event
+  const targetId = id || (typeof e === 'string' ? e : null);
+
+  if (!targetId) {
+    console.error("No product ID provided for deletion.");
+    return;
+  }
+
+  try {
+    // 1. Send delete request to Railway
+    await axios.delete(`https://mongo-db-production-8ab9.up.railway.app/products/${targetId}`);
+    
+    // 2. Immediately force remove the card from the screen (DO NOT call fetchProducts)
+    setProducts((prevProducts) => 
+      prevProducts.filter((product) => String(product._id || product.id) !== String(targetId))
+    );
+
+    console.log("Deleted successfully from screen and database!");
+  } catch (error) {
+    console.error('Error deleting product:', error);
+  }
+};
+
+  
   return (
 
     <div className="main-container">
@@ -257,7 +278,7 @@ products.map((item, index) => (
         type="button" 
         className="btn btn-secondary" 
         style={{ padding: "10px 20px", fontSize: "1rem", minWidth: "100px" }}
-        onClick={() => handleDeleteProduct(item._id || item.id)}
+        onClick={(e) => handleDeleteProduct(e, item._id || item.id)}
       >
         Delete
       </button>

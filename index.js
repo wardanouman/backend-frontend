@@ -22,6 +22,7 @@ mongoose.connect(process.env.MONGODB_URI)
   .catch((error) => console.error("MongoDB connection failed:", error));
 
 app.get("/products", async (req, res) => {
+  res.setHeader("Cache-Control", "no-cache");
   try {
     const products = await Product.find();
     res.json(products);
@@ -48,12 +49,20 @@ app.post("/products", async (req, res) => {
 app.delete("/products/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    await Product.findOneAndDelete({ id: id });
+    console.log(`Attempting to delete product with ID: ${id}`);
+    const deletedProduct = await Product.findByIdAndDelete(id);
+    if (!deletedProduct) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+    console.log(`Product deleted: ${JSON.stringify(deletedProduct)}`);
     res.status(204).send();
   } catch (error) {
+    console.error('Error deleting product:', error);
     res.status(500).json({ error: "Failed to delete product" });
   }
 });
+
+
 
 app.put("/products/:id", async (req, res) => {
   try {
