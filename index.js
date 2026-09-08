@@ -60,7 +60,7 @@ app.put("/products/:id", async (req, res) => {
     const { id } = req.params;
     const updateProductFields = req.body;
     const updatedProduct = await Product.findOneAndUpdate(
-      { _id: id },
+      { id: id },
       updateProductFields,
       { new: true }
     );

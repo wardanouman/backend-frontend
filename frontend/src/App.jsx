@@ -76,7 +76,7 @@ function App() {
         name: updateTitle,
         imageUrl: updateImage,
         price: Number(updatePrice),
-        desc: updateDesc,
+        description: updateDesc,
       });
       setUpdateId('');
       setUpdateTitle('');
