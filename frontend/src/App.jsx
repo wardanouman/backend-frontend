@@ -199,52 +199,82 @@ function App() {
           {products.length === 0 ? (
             <p className="no-products">No products loaded yet.</p>
           ) : (
-            products.map((item, index) => (
-              <div key={item.id || item._id || index} className="product-card">
-                <div className="img-container">
-                  <img
-                   src={item.imageUrl || item.image} 
-                  alt={item.title || item.name || 'Product Image'}
-                  style={{ width: '100%', height: 'auto', maxHeight: '200px',objectFit: "contain",
-                    borderRadius: '8px', marginBottom: '10px'
-                   }} />
-                </div>
-              
-{/* FORMAL LABELS & DETAILS */}
-          <div className="product-details" style={{ marginTop: "12px", textAlign: "left" }}>
-            <h3 style={{ textTransform: "capitalize", margin: "4px 0" }}>
-              <strong>Title:</strong> {item.title || item.name || 'Untitled Product'}
-            </h3>
-            
-            <p style={{ fontWeight: "bold", margin: "4px 0", color: "#2c3e50" }}>
-              <strong>Price:</strong> ${item.price}
-            </p>
 
-            <p style={{ margin: "8px 0", color: "#555", textAlign: "center" }}>
-              <strong>Description:</strong> {item.desc || item.description || 'No description provided.'}
-            </p>
-          </div>
+products.map((item, index) => (
+  <div key={item._id || item.id || index} className="product-card">
+    {/* IMAGE CONTAINER */}
+    <div className="img-container">
+      <img 
+        src={item.imageUrl || item.image} 
+        alt={item.title || item.name || 'Product Image'} 
+        style={{ width: "100%", height: "auto", maxHeight: "200px", objectFit: "contain", borderRadius: "8px" }}
+      />
+    </div>
 
-          {/* CENTERED BUTTONS INCLUDING ADD TO CART */}
-          <div className="card-actions" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px", marginTop: "12px" }}>
-            <div style={{ display: "flex", gap: "10px" }}>
-              <button type="button" className="btn btn-secondary" onClick={() => handleSelectForUpdate(item)}>
-                Edit
-              </button>
-              <button type="button" className="btn btn-secondary" onClick={() => handleDeleteProduct(item.id || item._id)}>
-                Delete
-              </button>
-            </div>
-            <button type="button" className="btn btn-secondary">
-              Add to Cart
-            </button>
-          </div>
-        </div>
-              ))
+    {/* CENTERED INNER BOX FOR DETAILS */}
+    <div 
+      style={{
+        backgroundColor: "#f8f9fa",
+        border: "1px solid #e2e8f0",
+        borderRadius: "10px",
+        padding: "16px",
+        margin: "16px auto",
+        textAlign: "center",
+        maxWidth: "90%"
+      }}
+    >
+      <h3 style={{ margin: "6px 0", fontSize: "1.1rem", color: "#1a1a1a", textTransform: "capitalize" }}>
+        <strong>Title:</strong> {item.title || item.name || 'Untitled Product'}
+      </h3>
+      <h3 style={{ margin: "6px 0", fontSize: "1.1rem", color: "#1a1a1a" }}>
+        <strong>Price:</strong> ${item.price}
+      </h3>
+      <h3 style={{ margin: "6px 0", fontSize: "1.1rem", color: "#1a1a1a", textTransform: "capitalize" }}>
+        <strong>Description:</strong> {item.desc || item.description || 'No description provided.'}
+      </h3>
+    </div>
+
+    {/* BUTTONS IN A SINGLE ROW */}
+    <div 
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        gap: "12px",
+        marginTop: "16px",
+        flexWrap: "wrap"
+      }}
+    >
+      <button 
+        type="button" 
+        className="btn btn-secondary" 
+        style={{ padding: "10px 20px", fontSize: "1rem", minWidth: "100px" }}
+        onClick={() => handleSelectForUpdate(item)}
+      >
+        Edit
+      </button>
+      <button 
+        type="button" 
+        className="btn btn-secondary" 
+        style={{ padding: "10px 20px", fontSize: "1rem", minWidth: "100px" }}
+        onClick={() => handleDeleteProduct(item._id || item.id)}
+      >
+        Delete
+      </button>
+      <button 
+        type="button" 
+        className="btn btn-secondary" 
+        style={{ padding: "10px 20px", fontSize: "1rem", minWidth: "120px" }}
+      >
+        Add to Cart
+      </button>
+    </div>
+  </div>
+))
           )}
         </div>
       </div>
-    </div>
+ </div>
   )
 }
 
