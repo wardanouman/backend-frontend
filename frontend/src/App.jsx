@@ -195,7 +195,11 @@ function App() {
             products.map((item, index) => (
               <div key={item.id || item._id || index} className="product-card">
                 <div className="img-container">
-                  <img src={item.imageUrl || item.image} alt={item.title || item.name || 'Product Image'} />
+                  <img src={item.imageUrl || item.image} 
+                  alt={item.title || item.name || 'Product Image'}
+                  style={{ width: '100%', height: 'auto', maxHeight: '200px',objectFit: "contain",
+                    borderRadius: '8px', marginBottom: '10px'
+                   }} />
                 </div>
                 
 
