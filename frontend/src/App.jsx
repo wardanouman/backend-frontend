@@ -8,7 +8,7 @@ function App() {
   //update product PUT//
   const [updateId, setUpdateId] = useState('');
   const [updateTitle, setUpdateTitle] = useState('');
-  const [updateImage, setUpdateImage] = useState('');
+  const [updateImageUrl, setUpdateImageUrl] = useState('');
   const [updateDesc, setUpdateDesc] = useState('');
   const [updatePrice, setUpdatePrice] = useState('');
   //new product POST//
@@ -37,10 +37,10 @@ function App() {
   const handleAddProduct = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(' https://mongo-db-production-8ab9.up.railway.app/products', {
+      await axios.post('https://mongo-db-production-8ab9.up.railway.app/products', {
         id : new Date().getTime().toString(),
         name: newTitle,
-        image: newImage,
+        imageUrl: newImage,
         price: Number(newPrice),
         desc: newDesc,
       });
@@ -59,35 +59,35 @@ function App() {
     const selectedId = item.id || item._id || '' ;
     setUpdateId(selectedId);
     setUpdateTitle(item.title || item.name || '');
-    setUpdateImage(item.image || '');
+    setUpdateImageUrl(item.image || '');
     setUpdatePrice(item.price || '');
     setUpdateDesc(item.desc || item.description || '');
   };
 
   // 2. PUT Function
-  const handleUpdateProduct = async (e) => {
-    e.preventDefault();
+  async function handleUpdateProduct(e) {
+    e.preventDefault()
     if (!updateId) {
-      alert('please click "Edit" on a prodct card to load its ID!');
-      return;
+      alert('please click "Edit" on a prodct card to load its ID!')
+      return
     }
     try {
       await axios.put(`https://mongo-db-production-8ab9.up.railway.app/products/${updateId}`, {
         name: updateTitle,
-        imageUrl: updateImage,
+        imageUrl: updateImageUrl,
         price: Number(updatePrice),
         description: updateDesc,
-      });
-      setUpdateId('');
-      setUpdateTitle('');
-      setUpdateImage('');
-      setUpdatePrice('');
-      setUpdateDesc('');
-      fetchProducts();
+      })
+      setUpdateId('')
+      setUpdateTitle('')
+      setUpdateImageUrl('')
+      setUpdatePrice('')
+      setUpdateDesc('')
+      fetchProducts()
     } catch (error) {
-      console.error('Error updating product:', error);
+      console.error('Error updating product:', error)
     }
-  };
+  }
 
   // 3. DELETE Function
   const handleDeleteProduct = async (id) => {
@@ -166,8 +166,8 @@ function App() {
           <input
             type="text"
             placeholder="Image URL"
-            value={updateImage}
-            onChange={(e) => setUpdateImage(e.target.value)}
+            value={updateImageUrl}
+            onChange={(e) => setUpdateImageUrl(e.target.value)}
           />
           <input
             type="number"
@@ -193,12 +193,12 @@ function App() {
             <p className="no-products">No products loaded yet.</p>
           ) : (
             products.map((item, index) => (
-              <div key={index} className="product-card">
-                {item.image && (
-                  <div className="img-container">
-                    <img src={item.image} alt={item.title} />
-                  </div>
-                )}
+              <div key={item.id || item._id || index} className="product-card">
+                <div className="img-container">
+                  <img src={item.imageUrl || item.image} alt={item.title || item.name || 'Product Image'} />
+                </div>
+                
+
                 <h4>{item.title || item.name|| 'Untitled Product'}</h4>
                 {item.price && <p className="price">{item.price}</p>}
                 <p className="desc">{item.desc || item.description}</p>
