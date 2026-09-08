@@ -114,83 +114,79 @@ function App() {
   }
 
   return (
-    <div className="main-container">
-      <div className="forms-wrapper">
-        {/* New Product Form */}
-        <form className="form-card" onSubmit={handleAddProduct}>
-          <h3>New Product</h3>
-          <input
-            type="text"
-            placeholder="Product ID (Auto-filled)"
-            value={updateId || ''}
-            onChange={(e) => setUpdateId(e.target.value)}
-          />
-          <input
-            type="text"
-            placeholder="Title"
-            value={newTitle}
-            onChange={(e) => setNewTitle(e.target.value)}
-          />
-          <input
-            type="text"
-            placeholder="Image URL"
-            value={newImage}
-            onChange={(e) => setNewImage(e.target.value)}
-          />
-          <input
-            type="number"
-            placeholder="Price"
-            value={newPrice}
-            onChange={(e) => setNewPrice(e.target.value)}
-          />
-          <textarea
-            placeholder="Description"
-            rows="3"
-            value={newDesc}
-            onChange={(e) => setNewDesc(e.target.value)}
-          />
-          <button type="submit" className="btn btn-primary">Add Product</button>
-        </form>
 
-        {/* Product Update Form */}
-        <div classNam="update-section" ref={updateSectionRef}>
-          <h2>Update Product</h2>
-          </div>
-        <form className="form-card" onSubmit={handleUpdateProduct}>
-          <h3>Product Update</h3>
-          <input
-            type="text"
-            placeholder="Product ID (Auto-filled)"
-            value={updateId}
-            onChange={(e) => setUpdateId(e.target.value)}
-          />
-          <input
-            type="text"
-            placeholder="Title"
-            value={updateTitle}
-            onChange={(e) => setUpdateTitle(e.target.value)}
-          />
-          <input
-            type="text"
-            placeholder="Image URL"
-            value={updateImageUrl}
-            onChange={(e) => setUpdateImageUrl(e.target.value)}
-          />
-          <input
-            type="number"
-            placeholder="Price"
-            value={updatePrice}
-            onChange={(e) => setUpdatePrice(e.target.value)}
-          />
-          <textarea
-            placeholder="Description"
-            rows="3"
-            value={updateDesc}
-            onChange={(e) => setUpdateDesc(e.target.value)}
-          />
-          <button type="submit" className="btn btn-secondary">Update Product</button>
+    <div className="main-container">
+
+      <div style={{ maxWidth: "1200px", margin: "0 auto 30px auto", width: "100%" }}>
+      
+      {/* NEW PRODUCT CARD */}
+      <div className="add-section"
+       style={{ backgroundColor: "#ffffff", padding: "24px", borderRadius: "12px",
+        boxShadow: "0 2px 8px rgba(0,0,0,0.05)", marginBottom: "24px" }}>
+        <h2 style={{ fontSize: "1.5rem", marginBottom: "16px", color: "#1a1a1a", textAlign: "left" }}>
+          New Product</h2>
+        <form onSubmit={handleAddProduct} 
+        style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+          <input type="text"
+           placeholder="Product ID (Auto-filled)" 
+           disabled style={{ padding: "10px", borderRadius: "6px", border: "1px solid #ccc" }} />
+          <input type="text"
+           placeholder="Title"
+           value={newTitle} onChange={(e) => setNewTitle(e.target.value)} 
+           style={{ padding: "10px", borderRadius: "6px", border: "1px solid #ccc" }} />
+          <input type="text" placeholder="Image URL"
+           value={newImage} onChange={(e) => setNewImage(e.target.value)} 
+           style={{ padding: "10px", borderRadius: "6px", border: "1px solid #ccc" }} />
+          <input type="number"
+           placeholder="Price"
+            value={newPrice} onChange={(e) => setNewPrice(e.target.value)} 
+            style={{ padding: "10px", borderRadius: "6px", border: "1px solid #ccc" }} />
+          <textarea placeholder="Description" rows="3" 
+          value={newDesc} onChange={(e) => setNewDesc(e.target.value)}
+           style={{ padding: "10px", borderRadius: "6px", border: "1px solid #ccc" }} />
+          <button type="submit" className="btn btn-secondary"
+           style={{ padding: "12px", fontSize: "1rem", alignSelf: "flex-start", minWidth: "140px" }}>
+            Add Product</button>
         </form>
       </div>
+//
+      {/* PRODUCT UPDATE CARD */}
+      <div className="update-section" 
+      ref={updateSectionRef} 
+      style={{ backgroundColor: "#ffffff", padding: "24px",
+       borderRadius: "12px", boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
+        <h2 style={{ fontSize: "1.5rem", marginBottom: "16px", 
+          color: "#1a1a1a", textAlign: "left" }}>
+            Product Update</h2>
+        <form onSubmit={handleUpdateProduct}
+       style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+          <input type="text"
+           placeholder="Product ID (Auto-filled)" 
+           value={updateId} onChange={(e) => setUpdateId(e.target.value)}
+            style={{ padding: "10px", borderRadius: "6px", border: "1px solid #ccc" }} />
+          <input type="text" placeholder="Title"
+           value={updateTitle} onChange={(e) => setUpdateTitle(e.target.value)}
+            style={{ padding: "10px", borderRadius: "6px", border: "1px solid #ccc" }} />
+          <input type="text"
+           placeholder="Image URL" 
+           value={updateImageUrl} onChange={(e) => setUpdateImageUrl(e.target.value)} 
+           style={{ padding: "10px", borderRadius: "6px", border: "1px solid #ccc" }} />
+          <input type="number"
+           placeholder="Price"
+            value={updatePrice} onChange={(e) => setUpdatePrice(e.target.value)} 
+            style={{ padding: "10px", borderRadius: "6px", border: "1px solid #ccc" }} />
+          <textarea placeholder="Description" 
+          rows="3" value={updateDesc} onChange={(e) => setUpdateDesc(e.target.value)} 
+          style={{ padding: "10px", borderRadius: "6px", border: "1px solid #ccc" }} />
+          <button type="submit" className="btn btn-secondary" 
+          style={{ padding: "12px", fontSize: "1rem", alignSelf: "flex-start", minWidth: "140px" }}>
+            Update Product</button>
+        </form>
+      </div>
+
+    </div>
+      
+         
 
       {/* PRODUCTS DISPLAY SECTION */}
       <div className="products-section">
