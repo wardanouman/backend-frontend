@@ -1,302 +1,216 @@
-import React, { useEffect, useState ,useRef} from 'react'
-import axios from 'axios'
-import './App.css'
+import React, { useState, useEffect } from 'react';
 
-function App() {
-  const [count, setCount] = useState(0)
-  const [products, setProducts] = useState([])
-  const updateSectionRef = useRef(null);
-  //update product PUT//
-  const [updateId, setUpdateId] = useState('');
-  const [updateTitle, setUpdateTitle] = useState('');
-  const [updateImageUrl, setUpdateImageUrl] = useState('');
-  const [updateDesc, setUpdateDesc] = useState('');
-  const [updatePrice, setUpdatePrice] = useState('');
-  //new product POST//
-  const [newTitle, setNewTitle] = useState('');
-  const [newImage, setNewImage] = useState('');
-  const [newDesc, setNewDesc] = useState('');
-  const [newPrice, setNewPrice] = useState('');
+const API_BASE_URL = 'https://mongo-db-production-8ab9.up.railway.app/products'; 
 
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await axios.get('https://mongo-db-production-8ab9.up.railway.app/products/')
-        console.log('Fetched products:', response.data)
-        setProducts(response.data)
-      } catch (error) {
-        console.error('Error fetching products:', error)
-      }
-    }
+export default function ProductApp() {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-    fetchProducts()
-  }, [])
+  // Form states
+  const [newProduct, setNewProduct] = useState({ id: '', title: '', image: '', price: '', description: '' });
+  const [updateProduct, setUpdateProduct] = useState({ id: '', title: '', image: '', price: '', description: '' });
 
-
-// 1. POST Function
-  const handleAddProduct = async (e) => {
-    e.preventDefault();
-    try {
-      await axios.post('https://mongo-db-production-8ab9.up.railway.app/products', {
-        id : new Date().getTime().toString(),
-        name: newTitle,
-        imageUrl: newImage,
-        price: Number(newPrice),
-        desc: newDesc,
-      });
-      setNewTitle('');
-      setNewImage('');
-      setNewPrice('');
-      setNewDesc('');
-      fetchProducts();
-    } catch (error) {
-      console.error('Error adding product:', error);
-    }
-  };
-
-  // Helper to pre-fill Update Form when Edit button is clicked
-  const handleSelectForUpdate = (item) => {
-    const selectedId = item.id || item._id || '' ;
-    setUpdateId(selectedId);
-    setUpdateTitle(item.title || item.name || '');
-    setUpdateImageUrl(item.image || item.imageUrl || '');
-    setUpdatePrice(item.price || '');
-    setUpdateDesc(item.desc || item.description || '');
-    if (updateSectionRef.current) {
-      updateSectionRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
-  // 2. PUT Function
-  async function handleUpdateProduct(e) {
-    e.preventDefault()
-    if (!updateId) {
-      alert('please click "Edit" on a prodct card to load its ID!')
-      return
-    }
-    try {
-      await axios.put(`https://mongo-db-production-8ab9.up.railway.app/products/${updateId}`, {
-        name: updateTitle,
-        imageUrl: updateImageUrl,
-        price: Number(updatePrice),
-        description: updateDesc,
-      })
-      setUpdateId('')
-      setUpdateTitle('')
-      setUpdateImageUrl('')
-      setUpdatePrice('')
-      setUpdateDesc('')
-      fetchProducts()
-    } catch (error) {
-      console.error('Error updating product:', error)
-    }
-  }
-
-  
-  const fetchProducts = async () => {
-    try {
-      const response = await axios.get('https://mongo-db-production-8ab9.up.railway.app/products/', {
-        headers: {
-          'Cache-Control': 'no-cache'
-        }
-      });
-      console.log('Fetched products:', response.data)
-      setProducts(response.data)
-    } catch (error) {
-      console.error('Error fetching products:', error)
-    }
-  }
- 
-const handleDeleteProduct = async (e, id) => {
-  if (e) {
-    e.preventDefault();
-    e.stopPropagation();
-  }
-
-  // Handle case whether id is passed directly or via click event
-  const targetId = id || (typeof e === 'string' ? e : null);
-
-  if (!targetId) {
-    console.error("No product ID provided for deletion.");
-    return;
-  }
-
-  try {
-    // 1. Send delete request to Railway
-    await axios.delete(`https://mongo-db-production-8ab9.up.railway.app/products/${targetId}`);
-    
-    // 2. Immediately force remove the card from the screen (DO NOT call fetchProducts)
-    setProducts((prevProducts) => 
-      prevProducts.filter((product) => String(product._id || product.id) !== String(targetId))
-    );
-
-    console.log("Deleted successfully from screen and database!");
-  } catch (error) {
-    console.error('Error deleting product:', error);
-  }
-};
-
-  
   return (
+    <div className="min-h-screen bg-gradient-to-b from-[#E8DDD1] to-[#D5C3B3] font-sans antialiased py-10 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-5xl mx-auto space-y-8">
 
-    <div className="main-container">
+        {/* Page Header */}
+        <header className="text-center space-y-2 mb-10">
+          <span className="inline-block px-3 py-1 bg-[#5A3A28]/10 text-[#5A3A28] font-semibold text-xs rounded-full uppercase tracking-wider">
+            Inventory & Catalog Management
+          </span>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-[#3D2517] tracking-tight">
+            Product Server Management
+          </h1>
+          <p className="text-[#6E5444] text-sm sm:text-base max-w-md mx-auto">
+            Create, update, and monitor your product listings in real-time.
+          </p>
+        </header>
 
-      <div style={{ maxWidth: "1200px", margin: "0 auto 30px auto", width: "100%" }}>
-      
-      {/* NEW PRODUCT CARD */}
-      <div className="add-section"
-       style={{ backgroundColor: "#ffffff", padding: "24px", borderRadius: "12px",
-        boxShadow: "0 2px 8px rgba(0,0,0,0.05)", marginBottom: "24px" }}>
-        <h2 style={{ fontSize: "1.5rem", marginBottom: "16px", color: "#1a1a1a", textAlign: "left" }}>
-          New Product</h2>
-        <form onSubmit={handleAddProduct} 
-        style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-          <input type="text"
-           placeholder="Product ID (Auto-filled)" 
-           disabled style={{ padding: "10px", borderRadius: "6px", border: "1px solid #ccc" }} />
-          <input type="text"
-           placeholder="Title"
-           value={newTitle} onChange={(e) => setNewTitle(e.target.value)} 
-           style={{ padding: "10px", borderRadius: "6px", border: "1px solid #ccc" }} />
-          <input type="text" placeholder="Image URL"
-           value={newImage} onChange={(e) => setNewImage(e.target.value)} 
-           style={{ padding: "10px", borderRadius: "6px", border: "1px solid #ccc" }} />
-          <input type="number"
-           placeholder="Price"
-            value={newPrice} onChange={(e) => setNewPrice(e.target.value)} 
-            style={{ padding: "10px", borderRadius: "6px", border: "1px solid #ccc" }} />
-          <textarea placeholder="Description" rows="3" 
-          value={newDesc} onChange={(e) => setNewDesc(e.target.value)}
-           style={{ padding: "10px", borderRadius: "6px", border: "1px solid #ccc" }} />
-          <button type="submit" className="btn btn-secondary"
-           style={{ padding: "12px", fontSize: "1rem", alignSelf: "flex-start", minWidth: "140px" }}>
-            Add Product</button>
-        </form>
-      </div>
+        {/* Top Forms Grid: New Product & Update Product */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+          
+          {/* Card 1: New Product Form */}
+          <div className="bg-white/90 backdrop-blur-md rounded-2xl p-6 sm:p-8 shadow-xl border border-[#E0D0C1] transition-all hover:shadow-2xl">
+            <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
+              <div className="w-10 h-10 rounded-xl bg-[#5A3A28]/10 flex items-center justify-center text-[#5A3A28] font-bold text-xl">
+                ＋
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-[#3D2517]">New Product</h2>
+                <p className="text-xs text-[#8A7060]">Add a new item to the store</p>
+              </div>
+            </div>
 
-      {/* PRODUCT UPDATE CARD */}
-      <div className="update-section" 
-      ref={updateSectionRef} 
-      style={{ backgroundColor: "#ffffff", padding: "24px",
-       borderRadius: "12px", boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
-        <h2 style={{ fontSize: "1.5rem", marginBottom: "16px", 
-          color: "#1a1a1a", textAlign: "left" }}>
-            Product Update</h2>
-        <form onSubmit={handleUpdateProduct}
-       style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-          <input type="text"
-           placeholder="Product ID (Auto-filled)" 
-           value={updateId} onChange={(e) => setUpdateId(e.target.value)}
-            style={{ padding: "10px", borderRadius: "6px", border: "1px solid #ccc" }} />
-          <input type="text" placeholder="Title"
-           value={updateTitle} onChange={(e) => setUpdateTitle(e.target.value)}
-            style={{ padding: "10px", borderRadius: "6px", border: "1px solid #ccc" }} />
-          <input type="text"
-           placeholder="Image URL" 
-           value={updateImageUrl} onChange={(e) => setUpdateImageUrl(e.target.value)} 
-           style={{ padding: "10px", borderRadius: "6px", border: "1px solid #ccc" }} />
-          <input type="number"
-           placeholder="Price"
-            value={updatePrice} onChange={(e) => setUpdatePrice(e.target.value)} 
-            style={{ padding: "10px", borderRadius: "6px", border: "1px solid #ccc" }} />
-          <textarea placeholder="Description" 
-          rows="3" value={updateDesc} onChange={(e) => setUpdateDesc(e.target.value)} 
-          style={{ padding: "10px", borderRadius: "6px", border: "1px solid #ccc" }} />
-          <button type="submit" className="btn btn-secondary" 
-          style={{ padding: "12px", fontSize: "1rem", alignSelf: "flex-start", minWidth: "140px" }}>
-            Update Product</button>
-        </form>
-      </div>
+            <form className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-[#5A3A28] uppercase tracking-wider mb-1">
+                  Product ID
+                </label>
+                <input
+                  type="text"
+                  placeholder="Product ID (Auto-filled)"
+                  readOnly
+                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-500 cursor-not-allowed focus:outline-none"
+                />
+              </div>
 
-    </div>
-      
-         
+              <div>
+                <label className="block text-xs font-semibold text-[#5A3A28] uppercase tracking-wider mb-1">
+                  Title
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. Leather Satchel"
+                  className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg text-sm text-gray-800 focus:ring-2 focus:ring-[#5A3A28] focus:border-transparent outline-none transition"
+                />
+              </div>
 
-      {/* PRODUCTS DISPLAY SECTION */}
-      <div className="products-section">
-        <h2>Fetched Products</h2>
-        <div className="product-grid">
-          {products.length === 0 ? (
-            <p className="no-products">No products loaded yet.</p>
-          ) : (
+              <div>
+                <label className="block text-xs font-semibold text-[#5A3A28] uppercase tracking-wider mb-1">
+                  Image URL
+                </label>
+                <input
+                  type="text"
+                  placeholder="https://images.unsplash.com/..."
+                  className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg text-sm text-gray-800 focus:ring-2 focus:ring-[#5A3A28] focus:border-transparent outline-none transition"
+                />
+              </div>
 
-products.map((item, index) => (
-  <div key={item._id || item.id || index} className="product-card">
-    {/* IMAGE CONTAINER */}
-    <div className="img-container">
-      <img 
-        src={item.imageUrl || item.image} 
-        alt={item.title || item.name || 'Product Image'} 
-        style={{ width: "100%", height: "auto", maxHeight: "200px", objectFit: "contain", borderRadius: "8px" }}
-      />
-    </div>
+              <div>
+                <label className="block text-xs font-semibold text-[#5A3A28] uppercase tracking-wider mb-1">
+                  Price ($)
+                </label>
+                <input
+                  type="number"
+                  placeholder="0.00"
+                  className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg text-sm text-gray-800 focus:ring-2 focus:ring-[#5A3A28] focus:border-transparent outline-none transition"
+                />
+              </div>
 
-    {/* CENTERED INNER BOX FOR DETAILS */}
-    <div 
-      style={{
-        backgroundColor: "#f8f9fa",
-        border: "1px solid #e2e8f0",
-        borderRadius: "10px",
-        padding: "16px",
-        margin: "16px auto",
-        textAlign: "center",
-        maxWidth: "90%"
-      }}
-    >
-      <h3 style={{ margin: "6px 0", fontSize: "1.1rem", color: "#1a1a1a", textTransform: "capitalize" }}>
-        <strong>Title:</strong> {item.title || item.name || 'Untitled Product'}
-      </h3>
-      <h3 style={{ margin: "6px 0", fontSize: "1.1rem", color: "#1a1a1a" }}>
-        <strong>Price:</strong> ${item.price}
-      </h3>
-      <h3 style={{ margin: "6px 0", fontSize: "1.1rem", color: "#1a1a1a", textTransform: "capitalize" }}>
-        <strong>Description:</strong> {item.desc || item.description || 'No description provided.'}
-      </h3>
-    </div>
+              <div>
+                <label className="block text-xs font-semibold text-[#5A3A28] uppercase tracking-wider mb-1">
+                  Description
+                </label>
+                <textarea
+                  rows="3"
+                  placeholder="Provide details about the product..."
+                  className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg text-sm text-gray-800 focus:ring-2 focus:ring-[#5A3A28] focus:border-transparent outline-none transition resize-none"
+                ></textarea>
+              </div>
 
-    {/* BUTTONS IN A SINGLE ROW */}
-    <div 
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        gap: "12px",
-        marginTop: "16px",
-        flexWrap: "wrap"
-      }}
-    >
-      <button 
-        type="button" 
-        className="btn btn-secondary" 
-        style={{ padding: "10px 20px", fontSize: "1rem", minWidth: "100px" }}
-        onClick={() => handleSelectForUpdate(item)}
-      >
-        Edit
-      </button>
-      <button 
-        type="button" 
-        className="btn btn-secondary" 
-        style={{ padding: "10px 20px", fontSize: "1rem", minWidth: "100px" }}
-        onClick={(e) => handleDeleteProduct(e, item._id || item.id)}
-      >
-        Delete
-      </button>
-      <button 
-        type="button" 
-        className="btn btn-secondary" 
-        style={{ padding: "10px 20px", fontSize: "1rem", minWidth: "120px" }}
-      >
-        Add to Cart
-      </button>
-    </div>
-  </div>
-))
-          )}
+              <button
+                type="button"
+                className="w-full mt-2 py-3 px-4 bg-[#5A3A28] hover:bg-[#442B1D] text-white font-semibold text-sm rounded-xl shadow-md transition-all active:scale-[0.99] cursor-pointer flex items-center justify-center gap-2"
+              >
+                <span>Add Product</span>
+              </button>
+            </form>
+          </div>
+
+          {/* Card 2: Product Update Form */}
+          <div className="bg-white/90 backdrop-blur-md rounded-2xl p-6 sm:p-8 shadow-xl border border-[#E0D0C1] transition-all hover:shadow-2xl">
+            <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
+              <div className="w-10 h-10 rounded-xl bg-[#5A3A28]/10 flex items-center justify-center text-[#5A3A28] font-bold text-xl">
+                ✏️
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-[#3D2517]">Product Update</h2>
+                <p className="text-xs text-[#8A7060]">Modify an existing product record</p>
+              </div>
+            </div>
+
+            <form className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-[#5A3A28] uppercase tracking-wider mb-1">
+                  Product ID
+                </label>
+                <input
+                  type="text"
+                  placeholder="Enter Product ID to Edit"
+                  className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg text-sm text-gray-800 focus:ring-2 focus:ring-[#5A3A28] focus:border-transparent outline-none transition"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-[#5A3A28] uppercase tracking-wider mb-1">
+                  Title
+                </label>
+                <input
+                  type="text"
+                  placeholder="Updated Title"
+                  className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg text-sm text-gray-800 focus:ring-2 focus:ring-[#5A3A28] focus:border-transparent outline-none transition"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-[#5A3A28] uppercase tracking-wider mb-1">
+                  Image URL
+                </label>
+                <input
+                  type="text"
+                  placeholder="Updated Image URL"
+                  className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg text-sm text-gray-800 focus:ring-2 focus:ring-[#5A3A28] focus:border-transparent outline-none transition"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-[#5A3A28] uppercase tracking-wider mb-1">
+                  Price ($)
+                </label>
+                <input
+                  type="number"
+                  placeholder="Updated Price"
+                  className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg text-sm text-gray-800 focus:ring-2 focus:ring-[#5A3A28] focus:border-transparent outline-none transition"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-[#5A3A28] uppercase tracking-wider mb-1">
+                  Description
+                </label>
+                <textarea
+                  rows="3"
+                  placeholder="Updated Description"
+                  className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg text-sm text-gray-800 focus:ring-2 focus:ring-[#5A3A28] focus:border-transparent outline-none transition resize-none"
+                ></textarea>
+              </div>
+
+              <button
+                type="button"
+                className="w-full mt-2 py-3 px-4 bg-[#5A3A28] hover:bg-[#442B1D] text-white font-semibold text-sm rounded-xl shadow-md transition-all active:scale-[0.99] cursor-pointer flex items-center justify-center gap-2"
+              >
+                <span>Update Product</span>
+              </button>
+            </form>
+          </div>
+
         </div>
-      </div>
- </div>
-  )
-}
 
-export default App
+        {/* Bottom Card: Fetched Products Display */}
+        <div className="bg-white/90 backdrop-blur-md rounded-2xl p-6 sm:p-8 shadow-xl border border-[#E0D0C1]">
+          <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-100">
+            <div>
+              <h2 className="text-2xl font-bold text-[#3D2517]">Fetched Products</h2>
+              <p className="text-xs text-[#8A7060]">Live records from backend database</p>
+            </div>
+            <span className="px-3 py-1 bg-amber-100 text-[#5A3A28] rounded-full text-xs font-bold">
+              0 Items
+            </span>
+          </div>
+
+          {/* Empty State */}
+          <div className="text-center py-12 px-4 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50/50">
+            <div className="w-12 h-12 mx-auto mb-3 text-[#8A7060] opacity-50 flex items-center justify-center text-3xl">
+              📦
+            </div>
+            <p className="text-gray-500 font-medium text-sm">No products loaded yet.</p>
+            <p className="text-gray-400 text-xs mt-1">Add items above or fetch from your MongoDB backend.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  );
+}
