@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const API_BASE_URL = 'https://mongo-db-production-8ab9.up.railway.app/products'; 
+const API_BASE_URL = 'http://localhost:5050';
 
 
 export default function ProductApp() {
