@@ -70,30 +70,28 @@ app.delete("/products/:id", async (req, res) => {
   }
 });
 
-app.put("/products/:id", async (req, res) => {
+// put route to update a product by id
+app.put('/products/:id', async (req, res) => {
   try {
-    const { id } = req.params;
-    const updateProductFields = req.body;
-    console.log(`Attempting to update product ID: ${id} with data:`, updateProductFields);
+    const productId = req.params.id;
     
-    // Fixed: using findOneAndUpdate with your custom schema's { id: id }
+  
     const updatedProduct = await Product.findOneAndUpdate(
-      { id: id },
-      updateProductFields,
-      { new: true, runValidators: true }
+      { $or: [{ id: productId }, { _id: productId }] },
+      { $set: req.body },
+      { new: true } // Returns the newly updated document
     );
 
     if (!updatedProduct) {
-      return res.status(404).json({ error: "Product not found" });
+      return res.status(404).json({ error: "Product not found in database" });
     }
 
-    console.log("Product updated successfully:", updatedProduct);
-    res.status(200).json(updatedProduct);
-  } catch (error) {
-    console.error("Error updating product:", error);
-    res.status(500).json({ error: "Failed to update product" });
+    res.json({ message: "Updated successfully", updatedProduct });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
+
 
 app.listen(5050, () => {
   console.log("Server is running on port 5050");
